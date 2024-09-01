@@ -49,7 +49,7 @@ const utils = {
 	 * 展示成功的消息提示
 	 * @param {Object} msg 提示的消息内容
 	 */
-	showSucess(msg) {
+	showSuccess(msg) {
 		return ElMessage({
 			message: msg,
 			grouping: true,

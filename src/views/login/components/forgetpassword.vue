@@ -14,22 +14,7 @@
             <el-button type="primary" @click="verifyAccount">下一步</el-button>
         </template>
     </el-dialog>
-
-    <el-dialog v-model="state.dialogVisble2" title="忘记密码" width="400px">
-        <el-form label-width="auto" :label-position="labelPosition" :rules="rules"> 
-            <el-form-item label="请输入密码" prop="account">
-                <el-input v-model="logindata.passwd" placeholder="请输入密码" />
-            </el-form-item>
-            <el-form-item label="请再次输入密码" prop="email">
-                <el-input v-model="logindata.newPassword" type="password" placeholder="请再次输入密码" show-password />
-            </el-form-item>
-            
-        </el-form>
-        <template #footer>
-            <el-button @click="state.dialogVisble2 = false">取 消</el-button>
-            <el-button type="primary" @click="resetPassword">确定</el-button>
-        </template>
-    </el-dialog>
+    
 </template>
 
 <script setup>

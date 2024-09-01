@@ -77,9 +77,12 @@ import forgetpassword from './components/forgetpassword.vue'
 import {register, login}  from '@/api/login'
 import utils from '@/utils'
 import {useRouter} from 'vue-router'
+import {useUserInfo} from '@/store/userinfo'
 
 const activeName = ref('first')
 const router = useRouter()
+const store = useUserInfo()
+
 
 const logindata = reactive({
     account: '',
@@ -95,8 +98,13 @@ const registerData = reactive({
 const Login = async () => {
     const res = await login(logindata)
     if(res.data.message === '登录成功'){
-        utils.showSucess('登录成功')
+        utils.showSuccess('登录成功')
+        console.log(res.data)
         localStorage.setItem('token', res.data.token)
+        localStorage.setItem('id', res.data.results.id)
+        localStorage.removeItem('pinia-userinfo')
+        // console.log(res.data.results.id)
+        store.userInfo(res.data.results.id)
         router.push('/menu')
     }else{
         console.log(res)
@@ -108,7 +116,7 @@ const Register = async () => {
     if(registerData.passwd === registerData.repasswd){
         const res = await register(registerData)
         if(res.data.message === '注册成功'){
-            utils.showSucess('注册成功')
+            utils.showSuccess('注册成功')
             activeName.value = 'first'
             
         }else{
@@ -123,7 +131,7 @@ const Register = async () => {
 
 const fpassword = ref(null)
 const click_open =  () => {
-    console.log(fpassword.value.open)
+    // console.log(fpassword.value.open)
     fpassword.value.open()
 }
 </script>

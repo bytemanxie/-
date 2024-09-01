@@ -114,15 +114,18 @@
 
 <script setup>
 import {useRouter} from 'vue-router'
+import { storeToRefs } from 'pinia';
 import {
   Menu as IconMenu,
 } from '@element-plus/icons-vue'
 
 import {reactive, toRefs} from 'vue'
+import {useUserInfo} from '@/store/userinfo'
+const userInfoStore = useUserInfo()
+const {imageUrl} = storeToRefs(userInfoStore)
 
 const state = reactive({
-  circleUrl:
-    'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png',
+  circleUrl: imageUrl.value,
 })
 
 const router = useRouter()
