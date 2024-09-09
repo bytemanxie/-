@@ -6,31 +6,18 @@
       <!-- 轮播图外壳 -->
       <div class="swiper-wrapped">
         <el-carousel :interval="4000" type="card" height="320px" indicator-position="outside">
-          <el-carousel-item v-for="item in 6" :key="item">
-            <h3 text="2xl" justify="center">{{ item }}</h3>
+          <el-carousel-item v-for="(item, index) in swiperimageUrl" :key="index">
+            <img v-if="swiperimageUrl[index]" :src="swiperimageUrl[index]" class="swiper" />
           </el-carousel-item>
         </el-carousel>
       </div>
+      <!-- 栅格布局外壳 -->
       <div class="layout-wrapped">
         <el-row :gutter="20">
-          <el-col :span="6">
+          <el-col :span="6" v-for="(item,index) in companyIntroduce" :key='index' @click="openIntroduce(index+1)">
             <div class="company-message-area">
-              <span>公司介绍</span>
-            </div>
-          </el-col>
-          <el-col :span="6">
-            <div class="company-message-area">
-              <span>公司架构</span>
-            </div>
-          </el-col>
-          <el-col :span="6">
-            <div class="company-message-area">
-              <span>公司战略</span>
-            </div>
-          </el-col>
-          <el-col :span="6">
-            <div class="company-message-area">
-              <span>高层介绍</span>
+              <span>{{item.set_name}}</span>
+              <div v-html='item.set_text' class="company-introduce"></div>
             </div>
           </el-col>
         </el-row>
@@ -56,11 +43,15 @@
       </div>
     </div>
   </div>
+  <introduce ref="intro" />
 </template>
 
 <script setup>
 import { ref, reactive } from 'vue';
 import BreadCrumb from '@/components/bread_crumb.vue';
+import { getAllSwiper, getAllCompanyIntroduce } from '@/api/setting';
+import introduce from './components/introduce.vue'
+import { bus } from "@/utils/mitt.js"
 
 const item = ref({
     first: '系统设置',
@@ -89,6 +80,28 @@ const tableData = [
     address: 'No. 189, Grove St, Los Angeles',
   },
 ]
+	// 轮播图
+	const swiperimageUrl = ref([])
+	// 获取轮播图
+	const returnAllSwiper = async () => {
+    swiperimageUrl.value = (await getAllSwiper()).data
+    console.log(swiperimageUrl.value)
+	}
+	returnAllSwiper()
+
+  // 公司介绍
+	const companyIntroduce = ref([])
+	const returnAllCompanyIntroduce = async () => {
+    companyIntroduce.value = (await getAllCompanyIntroduce()).data
+	}
+	returnAllCompanyIntroduce()
+
+  // 弹窗
+	const intro = ref()
+	const openIntroduce = (id) => {
+		bus.emit('introduce', id)
+		intro.value.open()
+	}
 </script>
 
 <style lang="scss" scoped="scoped">
@@ -131,6 +144,15 @@ const tableData = [
       span{
         border-bottom: 1px solid #409eff;
         font-size: 14px;
+      }
+      .company-introduce {
+        text-indent: 24px;
+        font-size: 14px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        -webkit-line-clamp: 3;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
       }
     }
     .company-message-area:hover{

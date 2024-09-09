@@ -17,8 +17,8 @@
                               :on-success="handleAvatarSuccess"
                               :before-upload="beforeAvatarUpload"
                             >
-                                <img v-if="imageUrl" :src="imageUrl" class="avatar" />
-                                <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
+                              <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+                              <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
                             </el-upload>     
                         </div>
                     </div>
@@ -139,7 +139,34 @@
           
                   </div>
                 </el-tab-pane>
-                <el-tab-pane label="其他设置" name="fourth">Task</el-tab-pane>
+                <el-tab-pane label="其他设置" name="fourth">
+                  <div class="other-set">
+                    <div class="department-set">
+                      <span>部门设置</span>
+                      <el-tag v-for="tag in dynamicTags" :key="tag" class="mx-1" closable
+                        :disable-transitions="false" @close="handleClose(tag)">
+                        {{ tag }}
+                      </el-tag>
+                      <el-input v-if="inputVisible" ref="InputRef" v-model="inputValue" class="ml-1 w-20"
+                        size="small" @keyup.enter="handleInputConfirm" @blur="handleInputConfirm" />
+                      <el-button v-else class="button-new-tag ml-1" size="small" @click="showInput">
+                        + 添加部门
+                      </el-button>
+                    </div>
+                    <div class="product-set">
+                      <span>产品设置</span>
+                      <el-tag v-for="tag in dynamicProductTags" :key="tag" class="mx-1" closable
+                        :disable-transitions="false" @close="handleProductClose(tag)">
+                        {{ tag }}
+                      </el-tag>
+                      <el-input v-if="inputProductVisible" ref="InputProductRef" v-model="inputProductValue" class="ml-1 w-20"
+                        size="small" @keyup.enter="handleInputProductConfirm" @blur="handleInputProductConfirm" />
+                      <el-button v-else class="button-new-tag ml-1" size="small" @click="showProductInput">
+                        + 添加产品
+                      </el-button>
+                    </div>
+                  </div>
+                </el-tab-pane>
             </el-tabs>
         </div>
     </div>
@@ -149,7 +176,7 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, toRaw } from 'vue';
 import BreadCrumb from '@/components/bread_crumb.vue';
 import { storeToRefs } from 'pinia';
 const activeName = ref('first')
@@ -157,7 +184,9 @@ const item = ref({
     first: '系统设置',
     second: '123'
 });
-
+import {
+		ElInput
+	} from 'element-plus'
 import { ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import {useUserInfo} from '@/store/userinfo'
@@ -166,7 +195,7 @@ import {bind, changeName, changeSex, changeEmail} from '@/api/userinfo'
 import ChangePassword from './components/change_password.vue'
 import editor from './components/editor.vue'
 import { bus } from "@/utils/mitt.js"
-import {getCompanyName, changeCompanyName, getAllSwiper,} from '@/api/setting'
+import {getCompanyName, changeCompanyName, getAllSwiper, getDepartment, setDepartment} from '@/api/setting'
 
 const userInfoStore = useUserInfo();
 const { name, sex, department, identity, imageUrl:image_url, account, email } = storeToRefs(userInfoStore);
@@ -294,7 +323,33 @@ const swiperData = [{
 	}
 	returnAllSwiper()
 
-
+  const inputValue = ref('')
+	const dynamicTags = ref()
+	const inputVisible = ref(false)
+	const InputRef = ref ()
+	// 产品设置
+	const inputProductValue = ref('')
+	const dynamicProductTags = ref()
+	const inputProductVisible = ref(false)
+	const InputProductRef = ref ()
+	// 获取部门数据
+	const returnDepartment = async() => {
+		dynamicTags.value = (await getDepartment()).data
+	}
+	returnDepartment()
+  // 部门设置关闭时的函数
+	const handleClose = async (tag) => {
+		dynamicTags.value.splice(dynamicTags.value.indexOf(tag), 1)
+		const res = await setDepartment(JSON.stringify(toRaw(dynamicTags.value)))
+		if (res.data.status == 0) {
+			ElMessage({
+				message: '删除部门成功',
+				type: 'success',
+			})
+		} else {
+			ElMessage.error('删除部门失败，请重新输入！')
+		}
+	}
 </script>
 
 <style lang="scss" scoped="scoped">
@@ -356,6 +411,27 @@ const swiperData = [{
 					}
 				}
 			}
+
+      /* 其他设置*/
+    .other-set {
+      padding-left: 50px;
+      font-size: 14px;
+
+      .department-set {
+        margin-bottom: 24px;
+
+        span {
+          margin-right: 24px;
+        }
+      }
+      
+      .product-set {
+        
+        span {
+          margin-right: 24px;
+        }
+      }
+    }
   }
 
   .demo-tabs > .el-tabs__content {

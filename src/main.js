@@ -7,6 +7,7 @@ import 'element-plus/dist/index.css'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import 'modern-normalize/modern-normalize.css';
 import pinia from './store'
+import '@/assets/css/common.scss'
 
 const app = createApp(App)
 app.use(router).use(ElementPlus).use(pinia).mount('#app')
